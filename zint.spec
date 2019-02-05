@@ -1,12 +1,18 @@
 Name:      zint
-Version:   2.4.2
+Version:   2.6.3
 Release:   2%{?dist}
 Summary:   A barcode generator and library
 License:   GPLv3+
 URL:       http://www.zint.org.uk
-Source:    https://github.com/downloads/zint/zint/%{name}-%{version}.src.tar.gz
+Source:    http://downloads.sourceforge.net/project/%{name}/%{name}/%{version}/%{name}-%{version}.src.tar.gz
 Group:     Applications/Engineering
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
+
+# Reset locales to "C" when exporting to EPS or SVG in order to force
+# decimal points in all language environments. 
+# This issue has been reported upstream:
+# http://sourceforge.net/mailarchive/forum.php?thread_name=4BF78012.7090508%40uos.de&forum_name=zint-barcode
+Patch0:    zint-locale.patch
 
 BuildRequires: cmake
 BuildRequires: libpng-devel
@@ -23,7 +29,7 @@ Features of the library:
   FNC1 characters.
 - Support for encoding binary data including NULL (ASCII 0) characters.
 - Health Industry Barcode (HIBC) encoding capabilities.
-- Output in PNG, EPS and SVG formats with user adjustable sizes and colors.
+- Output in the following file formats: PNG, GIF, EPS, WMF, BMP, TIF, SVG.
 - Verification stage for SBN, ISBN and ISBN-13 data.
 
 
@@ -64,6 +70,7 @@ C library and header files needed to develop applications using %{name}-qt.
 
 %prep
 %setup -q
+%patch0 -p1
 
 # remove BSD-licensed file required for Windows only (just to ensure that this package is plain GPLv3+)
 rm -f backend/ms_stdint.h
@@ -128,9 +135,20 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/qzint.h
 %{_libdir}/libQZint.so
 
+
 %changelog
-* Tue Aug 7 2012 Dominique Ribaut - 2.4.2
-- update to reflect use of github, see https://github.com/zint/zint for up to date chagelog
+
+* Thu Feb 15 2018 Robin Stuart <rstuart114@gmail.com> - 2.6.3
+- Version -> 2.6.3
+
+* Sun Oct 22 2017 Robin Stuat <rstuart114@gmail.com> - 2.6.2
+- Version -> 2.6.2
+
+* Sun Aug 27 2017 Robin Stuart <rstuart114@gmail.com> - 2.6.1
+- Version -> 2.6.1
+
+* Thu May 11 2017 Robin Stuart <rstuart114@gmail.com> - 2.6.0
+- Update version number
 
 * Sat May 22 2010 Martin Gieseking <martin.gieseking@uos.de> - 2.3.1-2
 - Added patch to fix export issue

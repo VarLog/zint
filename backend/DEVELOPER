@@ -59,18 +59,17 @@ composite.c:
 	CC-B Composite Symbology
 	CC-C Composite Symbology
 
+dotcode.c:
+        Dot Code
+
 dm200.c:
 	Data Matrix ECC 200
 
-dmatrix.c:
-	Data Matrix ECC 000
-	Data Matrix ECC 050
-	Data Matrix ECC 080
-	Data Matrix ECC 100
-	Data Matrix ECC 140
-
 gridmtx.c:
 	Grid Matrix
+
+hanxin.c:
+        Han Xin Code
 
 imail.c:
 	USPS OneCode (Intelligent Mail)
@@ -107,6 +106,7 @@ postal.c:
 qr.c:
 	QR Code
 	Micro QR Code
+        UPNQR
 
 rss.c:
 	GS1 DataBar (DataBar-14) (RSS-14)

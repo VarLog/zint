@@ -9,8 +9,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #comment or remove the above line before release
 
 set (ZINT_VERSION_MAJOR 2)
-set (ZINT_VERSION_MINOR 4)
-set (ZINT_VERSION_RELEASE 2)
+set (ZINT_VERSION_MINOR 6)
+set (ZINT_VERSION_RELEASE 3)
 set (ZINT_VERSION "${ZINT_VERSION_MAJOR}.${ZINT_VERSION_MINOR}.${ZINT_VERSION_RELEASE}" )
 
 add_definitions (-DZINT_VERSION=\"${ZINT_VERSION}\" -Wall)
@@ -26,9 +26,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCC)
     if (CXX_COMPILER_FLAG_WALL)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     endif (CXX_COMPILER_FLAG_WALL)
-
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99")
 endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCC)
+
 
 IF(APPLE)
     IF (UNIVERSAL) # TODO: make univeral binary
@@ -63,21 +62,28 @@ ENDIF(APPLE)
 add_subdirectory(backend)
 add_subdirectory(frontend)
 
-find_package(Qt4)
+find_package(Qt5Widgets)
+find_package(Qt5Gui)
+find_package(Qt5UiTools)
 
-if (QT4_FOUND)
-    set( QT_USE_QTGUI   TRUE )
-    set( QT_USE_QTUITOOLS TRUE )
-    set( QT_USE_QTXML TRUE )
-    include( ${QT_USE_FILE} )
-    include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${QT_INCLUDE_DIR}
-        ${CMAKE_CURRENT_BINARY_DIR}
-        )
-    add_subdirectory(backend_qt4)
-    add_subdirectory(frontend_qt4)
-endif(QT4_FOUND)
+if (Qt5Widgets_FOUND)
+    if (Qt5Gui_FOUND)
+        if (Qt5UiTools_FOUND)
+            set( QT_USE_QTGUI   TRUE )
+            set( QT_USE_QTUITOOLS TRUE )
+            set( QT_USE_QTXML TRUE )
+            include_directories(
+                ${CMAKE_CURRENT_SOURCE_DIR}
+                ${Qt5Widgets_INCLUDES}
+                ${Qt5Gui_INCLUDES}
+                ${Qt5UiTools_INCLUDES}
+                ${CMAKE_CURRENT_BINARY_DIR}
+                )
+            add_subdirectory(backend_qt)
+            add_subdirectory(frontend_qt)
+        endif(Qt5UiTools_FOUND)
+    endif(Qt5Gui_FOUND)
+endif(Qt5Widgets_FOUND)
 
 CONFIGURE_FILE(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
@@ -87,7 +93,14 @@ CONFIGURE_FILE(
 ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-install(FILES cmake/modules/FindZint.cmake DESTINATION ${CMAKE_ROOT}/Modules COMPONENT Devel)
+# staniek: don't install 
+if (DATA_INSTALL_DIR)
+    set(CMAKE_MODULES_INSTALL_PATH ${DATA_INSTALL_DIR}/cmake/modules)
+else (DATA_INSTALL_DIR)
+    set(CMAKE_MODULES_INSTALL_PATH ${CMAKE_ROOT}/Modules)
+endif(DATA_INSTALL_DIR)
+
+install(FILES cmake/modules/FindZint.cmake DESTINATION ${CMAKE_MODULES_INSTALL_PATH} COMPONENT Devel)
 
 # This needs to be run very last so other parts of the scripts can take
 # advantage of this.
